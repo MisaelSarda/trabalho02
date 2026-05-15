@@ -34,8 +34,8 @@ Para que o professor ou qualquer utilizador consiga executar este projeto localm
 
 **1. Clonar o repositório e aceder à pasta:**
 \`\`\`bash
-git clone <URL_DO_SEU_GITHUB_AQUI>
-cd projeto
+git clone https://github.com/MisaelSarda/trabalho02.git
+cd trabalho02
 \`\`\`
 
 **2. Iniciar a aplicação e o banco de dados:**
