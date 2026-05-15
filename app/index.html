@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Doações Solidárias</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+        .form-group { margin-bottom: 15px; }
+        input, select { padding: 8px; width: 100%; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px;}
+        button:hover { background-color: #218838; }
+        .btn-excluir { background-color: #dc3545; padding: 5px 10px; }
+        .btn-excluir:hover { background-color: #c82333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Doação de Roupas e Alimentos</h1>
+    
+    <h3>Cadastrar Nova Doação</h3>
+    <form id="doacaoForm">
+        <div class="form-group">
+            <label>Tipo de Doação:</label>
+            <select id="tipo" required>
+                <option value="Roupa">Roupa</option>
+                <option value="Alimento">Alimento</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Descrição do Item:</label>
+            <input type="text" id="descricao" placeholder="Ex: Casaco de frio / 1kg de Feijão" required>
+        </div>
+        <div class="form-group">
+            <label>Quantidade:</label>
+            <input type="number" id="quantidade" min="1" required>
+        </div>
+        <button type="submit">Cadastrar Doação</button>
+    </form>
+
+    <h3>Lista de Doações</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaDoacoes">
+            </tbody>
+    </table>
+
+    <script>
+        const form = document.getElementById('doacaoForm');
+        
+        
+        async function carregarDoacoes() {
+            const response = await fetch('/api/doacoes');
+            const doacoes = await response.json();
+            const tbody = document.getElementById('tabelaDoacoes');
+            tbody.innerHTML = '';
+            
+            doacoes.forEach(d => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${d.id}</td>
+                        <td>${d.tipo}</td>
+                        <td>${d.descricao}</td>
+                        <td>${d.quantidade}</td>
+                        <td>
+                            <button class="btn-excluir" onclick="excluirDoacao(${d.id})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        
+        async function excluirDoacao(id) {
+            if (confirm('Tem certeza que deseja excluir esta doação?')) {
+                await fetch(`/api/doacoes/${id}`, {
+                    method: 'DELETE'
+                });
+                carregarDoacoes(); 
+            }
+        }
+
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const tipo = document.getElementById('tipo').value;
+            const descricao = document.getElementById('descricao').value;
+            const quantidade = document.getElementById('quantidade').value;
+
+            await fetch('/api/doacoes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo, descricao, quantidade })
+            });
+
+            form.reset();
+            carregarDoacoes(); 
+        });
+
+        carregarDoacoes();
+    </script>
+</body>
+</html>
